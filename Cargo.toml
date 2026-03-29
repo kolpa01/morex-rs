@@ -1,0 +1,12 @@
+[package]
+name = "morex-rs"
+version = "0.1.0"
+license = "MIT"
+edition = "2024"
+
+[dependencies]
+dotenv = "0.15.0"
+serenity = "0.12.5"
+sqlx = { version = "0.8.6", features = ["runtime-tokio", "tls-native-tls", "postgres", "chrono"] }
+tokio = { version = "1.50.0", features = ["rt-multi-thread"] }
+chrono = "0.4.44"
