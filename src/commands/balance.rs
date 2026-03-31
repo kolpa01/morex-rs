@@ -1,6 +1,6 @@
 use serenity::all::{CommandInteraction, Context, CreateCommand, CreateCommandOption, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateInteractionResponse, CreateInteractionResponseMessage};
 
-use crate::{DbPool, morex};
+use crate::{DbPool, config, morex};
 
 pub fn register() -> CreateCommand {
     CreateCommand::new("balance")
@@ -26,7 +26,7 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) {
     
 
     let embed = CreateEmbed::new()
-        .color((b'\xce', b'\x4d', b'\xd5'))
+        .color(config::EMBED_COLOR)
         .author(
             CreateEmbedAuthor::new(format!("Balance {}", &interaction.user.name))
             .icon_url(av)
@@ -38,7 +38,7 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) {
             ]
         )
         .footer(
-            CreateEmbedFooter::new("Version 0.1.0")
+            CreateEmbedFooter::new(morex::get_version())
         );
         
     let response = CreateInteractionResponseMessage::new()

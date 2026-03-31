@@ -3,6 +3,7 @@ use sqlx::{PgPool, postgres::PgPoolOptions};
 
 pub mod commands;
 pub mod morex;
+pub mod config;
 
 struct Handler;
 #[async_trait]
