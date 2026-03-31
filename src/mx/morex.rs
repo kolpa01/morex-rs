@@ -6,16 +6,20 @@ use crate::mx::managers::data_base_manager::DataBaseManager;
 use crate::mx::handler::Handler;
 
 pub struct Morex {
-   token: String
+   token: String,
+   db_url: String
 }
 
 impl Morex {
    pub fn new() -> Self {
-      Self { token: dotenv::var("TOKEN").unwrap() }
+      Self {
+         token: dotenv::var("TOKEN").unwrap(),
+         db_url: dotenv::var("DATABASE_URL").unwrap()
+      }
    }
 
    pub async fn run(&self) {
-      let data_base_manager = DataBaseManager::new().await;
+      let data_base_manager = DataBaseManager::new(&self.db_url).await;
       let commands_manager = CommandsManager::new(data_base_manager.get_pool());
       let handler = Handler {
          commands_manager

@@ -6,10 +6,10 @@ pub struct DataBaseManager {
 }
 
 impl DataBaseManager {
-   pub async fn new() -> Self {
+   pub async fn new(url: &str) -> Self {
       let pool = PgPoolOptions::new()
           .max_connections(1)
-          .connect("postgres://postgres:password@localhost/MorexDB")
+          .connect(url)
           .await
           .expect("Failed initialize DataBaseManager!");
 
