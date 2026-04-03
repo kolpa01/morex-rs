@@ -1,6 +1,6 @@
 use serenity::all::{CommandInteraction, Context, CreateCommand, CreateCommandOption, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateInteractionResponse, CreateInteractionResponseMessage};
 
-use crate::{DbPool, config, morex};
+use crate::{DbPool, EmojiHandler, config, morex};
 
 pub fn register() -> CreateCommand {
     CreateCommand::new("balance")
@@ -18,12 +18,13 @@ pub fn register() -> CreateCommand {
 pub async fn run(ctx: &Context, interaction: &CommandInteraction) {
     let a = ctx.data.read().await;
     let pool = a.get::<DbPool>().unwrap();
+    let emojis = a.get::<EmojiHandler>().unwrap();
 
     morex::account::create_account(&interaction.user.id, &pool).await;
     let balance = morex::economy::get_bank_account(&interaction.user.id, &pool).await;
 
     let av = interaction.user.avatar_url().unwrap_or_else(|| interaction.user.default_avatar_url());
-    
+    let coin = &emojis.ui_emojis.as_ref().unwrap().coin;
 
     let embed = CreateEmbed::new()
         .color(config::EMBED_COLOR)
@@ -32,9 +33,9 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) {
             .icon_url(av)
         )
         .fields(vec![
-                ("Coins in the wallet:", format!("{} COIN", balance.wallet), false),
-                ("Coins in the bank:", format!("{} COIN", balance.bank), false),
-                ("All coins:", format!("{} COIN", balance.bank + balance.wallet), false),
+                ("Coins in the wallet:", format!("{} {}", balance.wallet, coin), false),
+                ("Coins in the bank:", format!("{} {}", balance.bank, coin), false),
+                ("All coins:", format!("{} {}", balance.bank + balance.wallet, coin), false),
             ]
         )
         .footer(

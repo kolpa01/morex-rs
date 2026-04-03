@@ -1,0 +1,8 @@
+{
+    "ui": {
+        "coin": {
+            "name": "MX_GoldenCoin",
+            "path": "assets/items/0005.png"
+        }
+    }
+}

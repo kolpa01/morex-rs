@@ -8,4 +8,10 @@ CREATE TABLE IF NOT EXISTS users (
     total_xp bigint NOT NULL, 
     version varchar(8) NOT NULL, 
     timestamp timestamptz(0) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS emojis (
+    path varchar(255) PRIMARY KEY, 
+    emoji_id bigint NOT NULL, 
+    checksum varchar(64) NOT NULL
 )

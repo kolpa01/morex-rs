@@ -1,9 +1,11 @@
 use serenity::{all::{ActivityData, ClientBuilder, Command, Context, EventHandler, GatewayIntents, Interaction, Ready}, async_trait, prelude::TypeMapKey};
 use sqlx::{PgPool, postgres::PgPoolOptions};
+use discord::{emojis::{EmojiHandler, ensure_emojis}};
 
 pub mod commands;
 pub mod morex;
 pub mod config;
+pub mod discord;
 
 struct Handler;
 #[async_trait]
@@ -12,6 +14,17 @@ impl EventHandler for Handler {
         println!("Logged in {}", ready.user.name);
 
         ctx.set_activity(Some(ActivityData::watching("Rusty Valley")));
+
+        let pool = {
+            let a = ctx.data.read().await;
+            a.get::<DbPool>().cloned().unwrap()
+        };
+
+        let emoji_handler: EmojiHandler = ensure_emojis(&pool, &ctx).await;
+
+        {
+            ctx.data.write().await.insert::<EmojiHandler>(emoji_handler);
+        }
 
         let commands = Command::set_global_commands(&ctx.http,
             vec![
@@ -59,12 +72,18 @@ async fn main() {
         .await
         .expect("Wow something failed");
 
+    sqlx::query!("CREATE TABLE IF NOT EXISTS emojis (path varchar(255) PRIMARY KEY, emoji_id bigint NOT NULL, checksum varchar(64) NOT NULL)")
+        .execute(&pool)
+        .await
+        .expect("Wow something failed");
+
     let token = dotenv::var("TOKEN").unwrap();
     let intents = GatewayIntents::all();
     let mut client = ClientBuilder::new(&token, intents)
         .event_handler(Handler)
         .await
         .expect("Failed to create client");
+
 
     client.data.write().await.insert::<DbPool>(pool);
 
